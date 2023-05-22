@@ -70,11 +70,11 @@ public class Grille extends Application{
 		
 		bordpane.setRight(rightButton);
 		BorderPane.setAlignment(rightButton, Pos.CENTER);
-		BorderPane.setMargin(rightButton, new Insets(0, 150, 0, 15));
+		BorderPane.setMargin(rightButton, new Insets(0, 250, 0, 15));
 		
 		bordpane.setLeft(leftButton);
 		BorderPane.setAlignment(leftButton, Pos.CENTER);
-		BorderPane.setMargin(leftButton, new Insets(0, 15, 0, 150));
+		BorderPane.setMargin(leftButton, new Insets(0, 15, 0, 250));
 		
 		 GridPane gridPane = createGridPane();
 		 bordpane.setCenter(gridPane);
