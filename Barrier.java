@@ -7,35 +7,25 @@ import java.util.Queue;
 
 public class Barrier {
 
-	int x, y, direction;
+	int direction;
+	Coordinates coordinates;
 
 	/*
 	 * the barrier are made to be set on junction of the line, while the pawn are on
 	 * plain square
 	 */
 
-	public Barrier(int x, int y, int direction) {
-		this.x = x;
-		this.y = y;
+	public Barrier(Coordinates coordinates, int direction) {
+		this.coordinates = coordinates;
 		this.direction = direction;
 	}
 
-	// x = column, between 0 and 8
-	public int getX() {
-		return x;
+	public Coordinates getCoordinates() {
+		return coordinates;
 	}
 
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	// y = row, between 0 and 8
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
+	public void setCoordinates(Coordinates coordinates) {
+		this.coordinates = coordinates;
 	}
 
 	// direction = 0 vertical barrier, direction = 1 horizontal barrier
@@ -49,29 +39,32 @@ public class Barrier {
 
 	boolean isBarrierPlacementValid(List<Coordinates> playersPosition, List<Barrier> listBarriers) {
 		// out of board
-		if ((this.getX() < 0 || this.getX() > 9) || (this.getY() < 0 || this.getY() > 9))
+		if ((this.coordinates.getX() < 0 || this.coordinates.getX() > 9)
+				|| (this.coordinates.getY() < 0 || this.coordinates.getY() > 9))
 			return false;
 
 		// half in the board
-		else if ((this.getX() == 0 || this.getX() == 9) && this.getDirection() == 1)
+		else if ((this.coordinates.getX() == 0 || this.coordinates.getX() == 9) && this.getDirection() == 1)
 			return false;
-		else if ((this.getY() == 0 || this.getY() == 9) && this.getDirection() == 0)
+		else if ((this.coordinates.getY() == 0 || this.coordinates.getY() == 9) && this.getDirection() == 0)
 			return false;
 
 		// look for barrier in the same place or just next to in the same direction
 		for (Barrier fence : listBarriers) {
-			int fenceX = fence.getX();
-			int fenceY = fence.getY();
+			int fenceX = fence.coordinates.getX();
+			int fenceY = fence.coordinates.getY();
 			int fenceDirection = fence.getDirection();
 
-			if (fenceX == this.getX() && fenceY == this.getY()) // same place
+			if (fenceX == this.coordinates.getX() && fenceY == this.coordinates.getY()) // same place
 				return false;
 			if (this.getDirection() == fenceDirection) { // next to in the same direction
-				if (this.getDirection() == 0 && (this.getX() == fenceX + 1 || this.getX() == fenceX - 1)
-						&& this.getY() == fenceY)
+				if (this.getDirection() == 0
+						&& (this.coordinates.getX() == fenceX + 1 || this.coordinates.getX() == fenceX - 1)
+						&& this.coordinates.getY() == fenceY)
 					return false;
-				else if (this.getDirection() == 1 && (this.getY() == fenceY + 1 || this.getY() == fenceY - 1)
-						&& this.getX() == fenceX)
+				else if (this.getDirection() == 1
+						&& (this.coordinates.getY() == fenceY + 1 || this.coordinates.getY() == fenceY - 1)
+						&& this.coordinates.getX() == fenceX)
 					return false;
 			}
 		}
@@ -118,7 +111,8 @@ public class Barrier {
 					}
 				}
 				if (queue.isEmpty())
-					return false; // no path found and empty queue
+					listBarriers.remove(listBarriers.size() - 1); // remove the new barrier we added
+				return false; // no path found and empty queue
 			}
 
 		}
@@ -135,8 +129,8 @@ public class Barrier {
 		int[][] list = { { x, x + 1, y, y, 1 }, { x + 1, x + 1, y, y + 1, 0 }, { x, x + 1, y + 1, y + 1, 1 },
 				{ x, x, y, y + 1, 0 } };
 		for (Barrier f : listBarriers) {
-			if ((f.getX() == list[direction][0] || f.getX() == list[direction][1])
-					&& (f.getY() == list[direction][2] || f.getY() == list[direction][3])
+			if ((f.coordinates.getX() == list[direction][0] || f.coordinates.getX() == list[direction][1])
+					&& (f.coordinates.getY() == list[direction][2] || f.coordinates.getY() == list[direction][3])
 					&& f.getDirection() == list[direction][4])
 				return true;
 		}
@@ -158,37 +152,36 @@ public class Barrier {
 
 		// define variable
 		List<Coordinates> playersPositions = new ArrayList<>();
-		Coordinates p1 = new Coordinates(0,0);
+		Coordinates p1 = new Coordinates(0, 0);
 		playersPositions.add(p1);
-		Coordinates p2 = new Coordinates(8,8);
+		Coordinates p2 = new Coordinates(8, 8);
 		playersPositions.add(p2);
-		Coordinates p3 = new Coordinates(0,8);
-		Coordinates p4 = new Coordinates(8,0);
+		Coordinates p3 = new Coordinates(0, 8);
+		Coordinates p4 = new Coordinates(8, 0);
 		playersPositions.add(p3);
 		playersPositions.add(p4);
-
 
 		List<Barrier> fences = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			Barrier f1 = new Barrier(2 * i + 1, 1, 1);
+			Coordinates c1 = new Coordinates(2 * i + 1, 1);
+			Barrier f1 = new Barrier(c1, 1);
 			fences.add(f1);
 		}
-		Barrier f2 = new Barrier(8, 2, 0);
+		Coordinates c2 = new Coordinates(8, 2);
+		Barrier f2 = new Barrier(c2, 0);
 		fences.add(f2);
 
-		
-		 /*some test residue 
-		Barrier verifier = new Barrier(8, 4, 1); 
-		Barrier verif = new Barrier(8, 3, 1); 
-		boolean[][] visite = new boolean[9][9];
-		  
-		 boolean isValid = verif.isBarrierPlacementValid(playersPositions, fences);
-		 boolean isValide = verif.isValidMove((Coordinates) Arrays.asList(8, 2), (Coordinates) Arrays.asList(7,2), 3, visite, fences);
-		 boolean isV = verif.isBarrier(Arrays.asList(0,0), 2, fences); 
-		 System.out.println(isValid);
+		/*
+		 * some test residue Barrier verifier = new Barrier(8, 4, 1); Barrier verif =
+		 * new Barrier(8, 3, 1); boolean[][] visite = new boolean[9][9];
+		 * 
+		 * boolean isValid = verif.isBarrierPlacementValid(playersPositions, fences);
+		 * boolean isValide = verif.isValidMove((Coordinates) Arrays.asList(8, 2),
+		 * (Coordinates) Arrays.asList(7,2), 3, visite, fences); boolean isV =
+		 * verif.isBarrier(Arrays.asList(0,0), 2, fences); System.out.println(isValid);
 		 */
-		 
+
 	}
 
 }
