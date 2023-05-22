@@ -1,0 +1,12 @@
+public class IllegaLArgumentException extends RuntimeException {
+	
+	
+	private static final long serialVersionUID = 1L;
+public IllegaLArgumentException() {
+	   super();
+   }
+   public IllegaLArgumentException(String mssg) {
+	   super(mssg);
+   }
+	
+}
