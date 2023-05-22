@@ -1,0 +1,25 @@
+public class Pion extends Coordinate {
+Coordinate position;  
+  //Constructor
+  public Pion(int posX,int posY) {
+	super (posX,posY);
+  
+  }
+  public int getPositionX() {
+	  return super.getPositionX();
+  }
+  
+  public void setPositionX(int posX) {
+	  super.setPositionX(posX);
+  }
+  
+  public int getPositionY() {
+	  return super.getPositionY();
+  }
+  
+  public void setPositionY(int posY) {
+	  super.setPositionY(posY);;
+  }
+  
+   
+}
