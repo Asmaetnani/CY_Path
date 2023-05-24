@@ -1,12 +1,17 @@
 package Abstraction;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class Barrier {
+public class Barrier implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int direction;
 	Coordinates coordinates;
 
@@ -77,7 +82,9 @@ public class Barrier {
 	private boolean pathFinding(List<Coordinates> playersPositions, List<Barrier> listBarriers) {
 		// principle of BFS
 		// add new barrier to see if it still allow a way out
-		listBarriers.add(this);
+		List<Barrier> lb = new ArrayList<>(listBarriers);
+
+		lb.add(this);
 		// help define adjacent square
 		int[] rowAdj = { 0, 1, 0, -1 };
 		int[] colAdj = { -1, 0, 1, 0 };
@@ -105,13 +112,12 @@ public class Barrier {
 					Coordinates adjPosition = new Coordinates((currentPosition.getX() + rowAdj[k]),
 							(currentPosition.getY() + colAdj[k]));
 
-					if (isValidMove(currentPosition, adjPosition, k, visited, listBarriers)) {
+					if (isValidMove(currentPosition, adjPosition, k, visited, lb)) {
 						visited[adjPosition.getX()][adjPosition.getY()] = true;
 						queue.add(adjPosition);
 					}
 				}
 				if (queue.isEmpty())
-					listBarriers.remove(listBarriers.size() - 1); // remove the new barrier we added
 				return false; // no path found and empty queue
 			}
 
@@ -120,7 +126,7 @@ public class Barrier {
 
 	}
 
-	boolean isBarrier(Coordinates position, int direction, List<Barrier> listBarriers) {
+	static boolean  isBarrier(Coordinates position, int direction, List<Barrier> listBarriers) {
 		// direction = where we want to go, 0 up, 1 right, 2 down, 3 left
 		int x = position.getX();
 		int y = position.getY();
@@ -138,7 +144,7 @@ public class Barrier {
 
 	}
 
-	boolean isValidMove(Coordinates position, Coordinates adjPosition, int direction, boolean[][] visited,
+	static boolean isValidMove(Coordinates position, Coordinates adjPosition, int direction, boolean[][] visited,
 			List<Barrier> listBarriers) {
 		// return true if adjPosition on board and no barrier between adjPosition and
 		// position
