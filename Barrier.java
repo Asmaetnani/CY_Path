@@ -119,7 +119,7 @@ public class Barrier implements Serializable {
 					Coordinate adjPosition = new Coordinate((currentPosition.getPositionX() + rowAdj[k]),
 							(currentPosition.getPositionY() + colAdj[k]));
 
-					if (isValidMove(currentPosition, adjPosition, k, visited, lb)) {
+					if (isValidMove(currentPosition, adjPosition, visited, lb)) {
 						visited[adjPosition.getPositionX()][adjPosition.getPositionY()] = true;
 						queue.add(adjPosition);
 					}
@@ -133,33 +133,45 @@ public class Barrier implements Serializable {
 
 	}
 
-	public static boolean isBarrier(Coordinate position, int direction, List<Barrier> listBarriers) {
+	public static boolean isBarrier(Coordinate position, Coordinate adjPosition, List<Barrier> listBarriers) {
 		// direction = where we want to go, 0 up, 1 right, 2 down, 3 left
 		int x = position.getPositionX();
 		int y = position.getPositionY();
+		int direction = -1;
+		if (x == adjPosition.getPositionX()) {
+			if (y == adjPosition.getPositionY() - 1)
+				direction = 0;
+			else
+				direction = 2;
+		} else {
+			if (x == adjPosition.getPositionX() - 1)
+				direction = 3;
+			else
+				direction = 1;
+		}
 
 		// don't mind this list, helped me factorize if test below
 		int[][] list = { { x, x + 1, y, y, 1 }, { x + 1, x + 1, y, y + 1, 0 }, { x, x + 1, y + 1, y + 1, 1 },
 				{ x, x, y, y + 1, 0 } };
-		for (Barrier f : listBarriers) {
-			if ((f.coordinate.getPositionX() == list[direction][0] || f.coordinate.getPositionX() == list[direction][1])
-					&& (f.coordinate.getPositionY() == list[direction][2]
-							|| f.coordinate.getPositionY() == list[direction][3])
-					&& f.getDirection() == list[direction][4])
+		for (Barrier b : listBarriers) {
+			if ((b.coordinate.getPositionX() == list[direction][0] || b.coordinate.getPositionX() == list[direction][1])
+					&& (b.coordinate.getPositionY() == list[direction][2]
+							|| b.coordinate.getPositionY() == list[direction][3])
+					&& b.getDirection() == list[direction][4])
 				return true;
 		}
 		return false;
 
 	}
 
-	public static boolean isValidMove(Coordinate position, Coordinate adjPosition, int direction, boolean[][] visited,
+	public static boolean isValidMove(Coordinate position, Coordinate adjPosition, boolean[][] visited,
 			List<Barrier> listBarriers) {
 		// return true if adjPosition on board and no barrier between adjPosition and
 		// position
 		return (adjPosition.getPositionX() >= 0) && (adjPosition.getPositionX() < 9)
 				&& (adjPosition.getPositionY() >= 0) && (adjPosition.getPositionY() < 9)
 				&& !visited[adjPosition.getPositionX()][adjPosition.getPositionY()]
-				&& !isBarrier(position, direction, listBarriers);
+				&& !isBarrier(position, adjPosition, listBarriers);
 	}
 
 	public static void main(String[] args) {
