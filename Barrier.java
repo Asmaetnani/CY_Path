@@ -6,34 +6,36 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class Barrier implements Serializable{
+//import Control.GameController;
+
+public class Barrier implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	int direction;
-	Coordinates coordinates;
+	Coordinate coordinate;
 
 	/*
 	 * the barrier are made to be set on junction of the line, while the pawn are on
 	 * plain square
 	 */
 
-	public Barrier(Coordinates coordinates, int direction) {
-		this.coordinates = coordinates;
+	public Barrier(Coordinate coordinate, int direction) {
+		this.coordinate = coordinate;
 		this.direction = direction;
+		// direction = 0 vertical barrier, direction = 1 horizontal barrier
 	}
 
-	public Coordinates getCoordinates() {
-		return coordinates;
+	public Coordinate getCoordinate() {
+		return coordinate;
 	}
 
-	public void setCoordinates(Coordinates coordinates) {
-		this.coordinates = coordinates;
+	public void setCoordinate(Coordinate coordinate) {
+		this.coordinate = coordinate;
 	}
 
-	// direction = 0 vertical barrier, direction = 1 horizontal barrier
 	public int getDirection() {
 		return direction;
 	}
@@ -42,34 +44,38 @@ public class Barrier implements Serializable{
 		this.direction = direction;
 	}
 
-	boolean isBarrierPlacementValid(List<Coordinates> playersPosition, List<Barrier> listBarriers) {
+	boolean isBarrierPlacementValid(List<Coordinate> playersPosition, List<Barrier> listBarriers) {
 		// out of board
-		if ((this.coordinates.getX() < 0 || this.coordinates.getX() > 9)
-				|| (this.coordinates.getY() < 0 || this.coordinates.getY() > 9))
+		if ((this.coordinate.getPositionX() < 0 || this.coordinate.getPositionX() > 9)
+				|| (this.coordinate.getPositionY() < 0 || this.coordinate.getPositionY() > 9))
 			return false;
 
 		// half in the board
-		else if ((this.coordinates.getX() == 0 || this.coordinates.getX() == 9) && this.getDirection() == 1)
+		else if ((this.coordinate.getPositionX() == 0 || this.coordinate.getPositionX() == 9)
+				&& this.getDirection() == 1)
 			return false;
-		else if ((this.coordinates.getY() == 0 || this.coordinates.getY() == 9) && this.getDirection() == 0)
+		else if ((this.coordinate.getPositionY() == 0 || this.coordinate.getPositionY() == 9)
+				&& this.getDirection() == 0)
 			return false;
 
 		// look for barrier in the same place or just next to in the same direction
 		for (Barrier fence : listBarriers) {
-			int fenceX = fence.coordinates.getX();
-			int fenceY = fence.coordinates.getY();
+			int fenceX = fence.coordinate.getPositionX();
+			int fenceY = fence.coordinate.getPositionY();
 			int fenceDirection = fence.getDirection();
 
-			if (fenceX == this.coordinates.getX() && fenceY == this.coordinates.getY()) // same place
+			if (fenceX == this.coordinate.getPositionX() && fenceY == this.coordinate.getPositionY()) // same place
 				return false;
 			if (this.getDirection() == fenceDirection) { // next to in the same direction
 				if (this.getDirection() == 0
-						&& (this.coordinates.getX() == fenceX + 1 || this.coordinates.getX() == fenceX - 1)
-						&& this.coordinates.getY() == fenceY)
+						&& (this.coordinate.getPositionX() == fenceX + 1
+								|| this.coordinate.getPositionX() == fenceX - 1)
+						&& this.coordinate.getPositionY() == fenceY)
 					return false;
 				else if (this.getDirection() == 1
-						&& (this.coordinates.getY() == fenceY + 1 || this.coordinates.getY() == fenceY - 1)
-						&& this.coordinates.getX() == fenceX)
+						&& (this.coordinate.getPositionY() == fenceY + 1
+								|| this.coordinate.getPositionY() == fenceY - 1)
+						&& this.coordinate.getPositionX() == fenceX)
 					return false;
 			}
 		}
@@ -79,7 +85,7 @@ public class Barrier implements Serializable{
 		return true;
 	}
 
-	private boolean pathFinding(List<Coordinates> playersPositions, List<Barrier> listBarriers) {
+	private boolean pathFinding(List<Coordinate> playersPositions, List<Barrier> listBarriers) {
 		// principle of BFS
 		// add new barrier to see if it still allow a way out
 		List<Barrier> lb = new ArrayList<>(listBarriers);
@@ -92,33 +98,34 @@ public class Barrier implements Serializable{
 		for (int i = 0; i < playersPositions.size(); i++) {
 			// initialize for a random player
 			boolean[][] visited = new boolean[9][9];
-			Queue<Coordinates> queue = new LinkedList<>();
+			Queue<Coordinate> queue = new LinkedList<>();
 
-			visited[playersPositions.get(i).getX()][playersPositions.get(i).getY()] = true;
+			visited[playersPositions.get(i).getPositionX()][playersPositions.get(i).getPositionY()] = true;
 			queue.add(playersPositions.get(i));
 
 			while (!queue.isEmpty()) {
 				// actualize the point where we are
-				Coordinates currentPosition = queue.poll();
+				Coordinate currentPosition = queue.poll();
 				// check if we reach the opposite side, depending on which player you are
-				if ((i == 0 && currentPosition.getY() == 8) || (i == 1 && currentPosition.getY() == 0)
-						|| (i == 2 && currentPosition.getX() == 8) || (i == 3 && currentPosition.getX() == 8))
+				if ((i == 0 && currentPosition.getPositionY() == 8) || (i == 1 && currentPosition.getPositionY() == 0)
+						|| (i == 2 && currentPosition.getPositionX() == 8)
+						|| (i == 3 && currentPosition.getPositionX() == 8))
 					// good for this player, we look for other player next
 					break;
 
 				// look which adjacent square can be reach
 				for (int k = 0; k < 4; k++) {
 					// Define the next position to look for
-					Coordinates adjPosition = new Coordinates((currentPosition.getX() + rowAdj[k]),
-							(currentPosition.getY() + colAdj[k]));
+					Coordinate adjPosition = new Coordinate((currentPosition.getPositionX() + rowAdj[k]),
+							(currentPosition.getPositionY() + colAdj[k]));
 
 					if (isValidMove(currentPosition, adjPosition, k, visited, lb)) {
-						visited[adjPosition.getX()][adjPosition.getY()] = true;
+						visited[adjPosition.getPositionX()][adjPosition.getPositionY()] = true;
 						queue.add(adjPosition);
 					}
 				}
 				if (queue.isEmpty())
-				return false; // no path found and empty queue
+					return false; // no path found and empty queue
 			}
 
 		}
@@ -126,17 +133,18 @@ public class Barrier implements Serializable{
 
 	}
 
-	static boolean  isBarrier(Coordinates position, int direction, List<Barrier> listBarriers) {
+	public static boolean isBarrier(Coordinate position, int direction, List<Barrier> listBarriers) {
 		// direction = where we want to go, 0 up, 1 right, 2 down, 3 left
-		int x = position.getX();
-		int y = position.getY();
+		int x = position.getPositionX();
+		int y = position.getPositionY();
 
 		// don't mind this list, helped me factorize if test below
 		int[][] list = { { x, x + 1, y, y, 1 }, { x + 1, x + 1, y, y + 1, 0 }, { x, x + 1, y + 1, y + 1, 1 },
 				{ x, x, y, y + 1, 0 } };
 		for (Barrier f : listBarriers) {
-			if ((f.coordinates.getX() == list[direction][0] || f.coordinates.getX() == list[direction][1])
-					&& (f.coordinates.getY() == list[direction][2] || f.coordinates.getY() == list[direction][3])
+			if ((f.coordinate.getPositionX() == list[direction][0] || f.coordinate.getPositionX() == list[direction][1])
+					&& (f.coordinate.getPositionY() == list[direction][2]
+							|| f.coordinate.getPositionY() == list[direction][3])
 					&& f.getDirection() == list[direction][4])
 				return true;
 		}
@@ -144,12 +152,13 @@ public class Barrier implements Serializable{
 
 	}
 
-	static boolean isValidMove(Coordinates position, Coordinates adjPosition, int direction, boolean[][] visited,
+	public static boolean isValidMove(Coordinate position, Coordinate adjPosition, int direction, boolean[][] visited,
 			List<Barrier> listBarriers) {
 		// return true if adjPosition on board and no barrier between adjPosition and
 		// position
-		return (adjPosition.getX() >= 0) && (adjPosition.getX() < 9) && (adjPosition.getY() >= 0)
-				&& (adjPosition.getY() < 9) && !visited[adjPosition.getX()][adjPosition.getY()]
+		return (adjPosition.getPositionX() >= 0) && (adjPosition.getPositionX() < 9)
+				&& (adjPosition.getPositionY() >= 0) && (adjPosition.getPositionY() < 9)
+				&& !visited[adjPosition.getPositionX()][adjPosition.getPositionY()]
 				&& !isBarrier(position, direction, listBarriers);
 	}
 
@@ -157,35 +166,32 @@ public class Barrier implements Serializable{
 		// Test fence placement validity, can be deleted later
 
 		// define variable
-		List<Coordinates> playersPositions = new ArrayList<>();
-		Coordinates p1 = new Coordinates(0, 0);
+		List<Coordinate> playersPositions = new ArrayList<>();
+		Coordinate p1 = new Coordinate(0, 0);
 		playersPositions.add(p1);
-		Coordinates p2 = new Coordinates(8, 8);
+		Coordinate p2 = new Coordinate(8, 8);
 		playersPositions.add(p2);
-		Coordinates p3 = new Coordinates(0, 8);
-		Coordinates p4 = new Coordinates(8, 0);
+		Coordinate p3 = new Coordinate(0, 8);
+		Coordinate p4 = new Coordinate(8, 0);
 		playersPositions.add(p3);
 		playersPositions.add(p4);
 
 		List<Barrier> fences = new ArrayList<>();
 
 		for (int i = 0; i < 4; i++) {
-			Coordinates c1 = new Coordinates(2 * i + 1, 1);
+			Coordinate c1 = new Coordinate(2 * i + 1, 1);
 			Barrier f1 = new Barrier(c1, 1);
 			fences.add(f1);
 		}
-		Coordinates c2 = new Coordinates(8, 2);
+		Coordinate c2 = new Coordinate(8, 2);
 		Barrier f2 = new Barrier(c2, 0);
 		fences.add(f2);
 
 		/*
-		 * some test residue Barrier verifier = new Barrier(8, 4, 1); Barrier verif =
-		 * new Barrier(8, 3, 1); boolean[][] visite = new boolean[9][9];
-		 * 
-		 * boolean isValid = verif.isBarrierPlacementValid(playersPositions, fences);
-		 * boolean isValide = verif.isValidMove((Coordinates) Arrays.asList(8, 2),
-		 * (Coordinates) Arrays.asList(7,2), 3, visite, fences); boolean isV =
-		 * verif.isBarrier(Arrays.asList(0,0), 2, fences); System.out.println(isValid);
+		 * //some test residue Coordinate c3 = new Coordinate(8, 3); Barrier verifier =
+		 * new Barrier(c3, 1); boolean isValid =
+		 * verifier.isBarrierPlacementValid(playersPositions, fences);
+		 * System.out.println(isValid);
 		 */
 
 	}
