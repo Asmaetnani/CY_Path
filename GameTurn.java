@@ -2,9 +2,6 @@ package Control;
 
 import Abstraction.*;
 
-import java.util.Observable;
-import java.util.Observer;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,28 +12,30 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-@SuppressWarnings("deprecation")
-public class GameTurn extends Application implements Observer {
-	public static void main(String[] args) {
-		launch(args);
-	}
 
-	public void update(Game game, Board board) {
+public class GameTurn {
+	
+	private Stage stage;
+	private Game game;
+	
+	  public GameTurn(Game game) {
+	        this.stage = new Stage();
+	        this.game = game;
+	        startTurn();
+	    }
+	
 
-	}
-
-	@Override
-	public void start(Stage primaryStage) {
+	public void startTurn() {
 		Button placeBarrierButton = new Button("Placer barrière");
 		placeBarrierButton.setOnAction(event -> {
 			showBarrierWindow();
-			primaryStage.close();
+			this.stage.close();
 		});
 
 		Button movePawnButton = new Button("Déplacer pion");
 		movePawnButton.setOnAction(event -> {
 			showPawnWindow();
-			primaryStage.close();
+			this.stage.close();
 		});
 
 		VBox vbox = new VBox(placeBarrierButton, movePawnButton);
@@ -44,9 +43,9 @@ public class GameTurn extends Application implements Observer {
 
 		Scene scene = new Scene(vbox, 300, 300);
 
-		primaryStage.setTitle("Your turn");
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		this.stage.setTitle("Player" + game.getCurrentPlayer()+"turn");
+		this.stage.setScene(scene);
+		this.stage.show();
 	}
 
 	private void showBarrierWindow() {
@@ -88,12 +87,8 @@ public class GameTurn extends Application implements Observer {
 			
 			Coordinate c = new Coordinate(ligne, colonne);
 			Barrier b = new Barrier(c, orientation);
-			GameController.placeBarrier(b);
+			game.placeBarrier(b);
 
-			/*
-			 * System.out.println("Ligne: " + ligne); System.out.println("Colonne: " +
-			 * colonne); System.out.println("Orientation: " + orientation);
-			 */
 
 			barrierStage.close();
 		});
@@ -111,7 +106,11 @@ public class GameTurn extends Application implements Observer {
 		Stage pawnStage = new Stage();
 
 		Button upButton = new Button("Haut");
-		upButton.setOnAction(event -> pawnStage.close());
+		
+		upButton.setOnAction(event ->{
+		//ajouter makeMove avec les bons arguments quand ok	
+		pawnStage.close();
+		});
 
 		Button downButton = new Button("Bas");
 		downButton.setOnAction(event -> pawnStage.close());
@@ -131,10 +130,8 @@ public class GameTurn extends Application implements Observer {
 		pawnStage.setScene(scene);
 		pawnStage.show();
 	}
+	  public void show() {
+	        stage.show();
+	    }
 
-	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-
-	}
 }
