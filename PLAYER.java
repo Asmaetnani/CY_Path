@@ -12,6 +12,7 @@ public class Player extends Pion  {
 				// color
 	int barriersLeft;
     private OccupiedCoordinates occupiedCoordinates;
+    int indexOfPlayer;
     
 
 	
@@ -71,6 +72,16 @@ public class Player extends Pion  {
 	
 	
 	// getters and setters
+	
+	
+	public int getIndexOfPlayer() {
+		return indexOfPlayer;
+	}
+
+
+	public void setIndexOfPlayer(int indexOfPlayer) {
+		this.indexOfPlayer = indexOfPlayer;
+	}
 	public String getName() {
 		return this.name;
 	}
@@ -211,3 +222,5 @@ public class Player extends Pion  {
 	 
 	
 }
+
+
