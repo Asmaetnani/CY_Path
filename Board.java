@@ -12,7 +12,7 @@ public class Board {
         initialiserPlateau(); 
     }
 
-    private void initialiserPlateau() {
+    public void initialiserPlateau() {
 		// Fills all cells of the board with the value "vide"
         for (int i = 0; i < TAILLE; i++) {
             for (int j = 0; j < TAILLE; j++) {
