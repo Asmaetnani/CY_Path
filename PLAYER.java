@@ -11,6 +11,7 @@ public class Player extends Pion  {
 	int color; // color is not in the Pion class because the gamer is the one who choose the
 				// color
 	int barriersLeft;
+	int indexOfPlayer;
     private OccupiedCoordinates occupiedCoordinates;
     
 
@@ -27,6 +28,7 @@ public class Player extends Pion  {
 		this.barriersLeft = barriersLeft;
 		// Fixing the starting position based on the boardsize and the player index
 		int initialPosition = (int) boardSize / 2;
+		
 
 		if (numberOfPlayer == 2) {
 			// if there are 2 players their Pions will be placed on opposites sides.
@@ -71,6 +73,14 @@ public class Player extends Pion  {
 	
 	
 	// getters and setters
+	public int getIndexOfPlayer() {
+		return indexOfPlayer;
+	}
+
+
+	public void setIndexOfPlayer(int indexOfPlayer) {
+		this.indexOfPlayer = indexOfPlayer;
+	}
 	public String getName() {
 		return this.name;
 	}
