@@ -14,15 +14,19 @@ public class Barrier implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	int direction;
-	Coordinate coordinate;
+	public Coordinate coordinate;
+	public Direction direction;
+
+	public enum Direction {
+		VERTICAL, HORIZONTAL
+	}
 
 	/*
 	 * the barrier are made to be set on junction of the line, while the pawn are on
 	 * plain square
 	 */
 
-	public Barrier(Coordinate coordinate, int direction) {
+	public Barrier(Coordinate coordinate, Direction direction) {
 		this.coordinate = coordinate;
 		this.direction = direction;
 		// direction = 0 vertical barrier, direction = 1 horizontal barrier
@@ -36,11 +40,11 @@ public class Barrier implements Serializable {
 		this.coordinate = coordinate;
 	}
 
-	public int getDirection() {
+	public Direction getDirection() {
 		return direction;
 	}
 
-	public void setDirection(int direction) {
+	public void setDirection(Direction direction) {
 		this.direction = direction;
 	}
 
@@ -52,27 +56,27 @@ public class Barrier implements Serializable {
 
 		// half in the board
 		else if ((this.coordinate.getPositionX() == 0 || this.coordinate.getPositionX() == 9)
-				&& this.getDirection() == 1)
+				&& this.getDirection() == Direction.HORIZONTAL)
 			return false;
 		else if ((this.coordinate.getPositionY() == 0 || this.coordinate.getPositionY() == 9)
-				&& this.getDirection() == 0)
+				&& this.getDirection() == Direction.VERTICAL)
 			return false;
 
 		// look for barrier in the same place or just next to in the same direction
 		for (Barrier fence : listBarriers) {
 			int fenceX = fence.coordinate.getPositionX();
 			int fenceY = fence.coordinate.getPositionY();
-			int fenceDirection = fence.getDirection();
+			Direction fenceDirection = fence.getDirection();
 
 			if (fenceX == this.coordinate.getPositionX() && fenceY == this.coordinate.getPositionY()) // same place
 				return false;
 			if (this.getDirection() == fenceDirection) { // next to in the same direction
-				if (this.getDirection() == 0
+				if (this.getDirection() == Direction.VERTICAL
 						&& (this.coordinate.getPositionX() == fenceX + 1
 								|| this.coordinate.getPositionX() == fenceX - 1)
 						&& this.coordinate.getPositionY() == fenceY)
 					return false;
-				else if (this.getDirection() == 1
+				else if (this.getDirection() == Direction.HORIZONTAL
 						&& (this.coordinate.getPositionY() == fenceY + 1
 								|| this.coordinate.getPositionY() == fenceY - 1)
 						&& this.coordinate.getPositionX() == fenceX)
@@ -151,14 +155,17 @@ public class Barrier implements Serializable {
 		}
 
 		// don't mind this list, helped me factorize if test below
-		int[][] list = { { x, x + 1, y, y, 1 }, { x + 1, x + 1, y, y + 1, 0 }, { x, x + 1, y + 1, y + 1, 1 },
-				{ x, x, y, y + 1, 0 } };
+		Object[][] list = { { x, x + 1, y, y, Direction.VERTICAL }, { x + 1, x + 1, y, y + 1, Direction.HORIZONTAL },
+				{ x, x + 1, y + 1, y + 1, Direction.VERTICAL }, { x, x, y, y + 1, Direction.HORIZONTAL } };
+
 		for (Barrier b : listBarriers) {
-			if ((b.coordinate.getPositionX() == list[direction][0] || b.coordinate.getPositionX() == list[direction][1])
-					&& (b.coordinate.getPositionY() == list[direction][2]
-							|| b.coordinate.getPositionY() == list[direction][3])
-					&& b.getDirection() == list[direction][4])
+			if ((b.coordinate.getPositionX() == (int) list[direction][0]
+					|| b.coordinate.getPositionX() == (int) list[direction][1])
+					&& (b.coordinate.getPositionY() == (int) list[direction][2]
+							|| b.coordinate.getPositionY() == (int) list[direction][3])
+					&& b.getDirection() == list[direction][4]) {
 				return true;
+			}
 		}
 		return false;
 
@@ -192,11 +199,11 @@ public class Barrier implements Serializable {
 
 		for (int i = 0; i < 4; i++) {
 			Coordinate c1 = new Coordinate(2 * i + 1, 1);
-			Barrier f1 = new Barrier(c1, 1);
+			Barrier f1 = new Barrier(c1, Direction.HORIZONTAL);
 			fences.add(f1);
 		}
 		Coordinate c2 = new Coordinate(8, 2);
-		Barrier f2 = new Barrier(c2, 0);
+		Barrier f2 = new Barrier(c2, Direction.VERTICAL);
 		fences.add(f2);
 
 		/*
