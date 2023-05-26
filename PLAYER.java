@@ -11,7 +11,6 @@ public class Player extends Pion  {
 	int color; // color is not in the Pion class because the gamer is the one who choose the
 				// color
 	int barriersLeft;
-	int indexOfPlayer;
     private OccupiedCoordinates occupiedCoordinates;
     
 
@@ -28,7 +27,6 @@ public class Player extends Pion  {
 		this.barriersLeft = barriersLeft;
 		// Fixing the starting position based on the boardsize and the player index
 		int initialPosition = (int) boardSize / 2;
-		
 
 		if (numberOfPlayer == 2) {
 			// if there are 2 players their Pions will be placed on opposites sides.
@@ -73,14 +71,6 @@ public class Player extends Pion  {
 	
 	
 	// getters and setters
-	public int getIndexOfPlayer() {
-		return indexOfPlayer;
-	}
-
-
-	public void setIndexOfPlayer(int indexOfPlayer) {
-		this.indexOfPlayer = indexOfPlayer;
-	}
 	public String getName() {
 		return this.name;
 	}
@@ -147,13 +137,35 @@ public class Player extends Pion  {
 	                    if (!occupiedCoordinates.isCoordinateOccupied(destination)&&(!barrierExists)&&occupiedCoordinates.isCoordinateOccupied(middleCoordinate)) {
 	                        pion = new Pion(destination.getPositionX(), destination.getPositionY());
 	                        occupiedCoordinates.addCoordinate(destination); // after verifing the whole conditions we have to mark that this cell is now occupied 
+	                    } 
+	                    else if (isDiagonal(destination)) {
+	                        // Vérifier si la destination est déjà occupée
+	                        if (!occupiedCoordinates.isCoordinateOccupied(destination)) {
+	                            // Récupérer les coordonnées de la case au milieu de la case du pion et de la destination (après le saut)
+	                            int middleX = (pion.getPositionX() + destination.getPositionX()) / 2;
+	                            int middleY = (pion.getPositionY() + destination.getPositionY()) / 2;
+	                            Coordinate middleCoordinate1 = new Coordinate(middleX, middleY);
+	                         // Vérifier que la destination est vide, la case du milieu est occupée et qu'il n'y a pas de barrière entre la case du milieu et la case d'arrivée
+	                            boolean barrierExists1 = Barrier.isBarrier(pion.position, destination, listBarriers);
+	                            if (!occupiedCoordinates.isCoordinateOccupied(destination) && (!barrierExists1) && occupiedCoordinates.isCoordinateOccupied(middleCoordinate1)) {
+	                                pion = new Pion(destination.getPositionX(), destination.getPositionY());
+	                                occupiedCoordinates.addCoordinate(destination); // Marquer la case d'arrivée comme occupée
+	                            }else {
+	                                throw new IllegalArgumentException("La case d'arrivée est déjà occupée ou la case à sauter est vide ou il y a une barrière entre la case du milieu et la case d'arrivée.");
+	                            }
+	                        } else {
+	                            throw new IllegalArgumentException("La case d'arrivée est déjà occupée.");
+	                        }
 	                    } else {
-	                        throw new IllegalArgumentException("La case d'arrivée est déjà occupée ou case a sauter est vide .");
+	                        throw new IllegalArgumentException("Les coordonnées ne sont pas diagonales.");
 	                    }
-	                } else {
+	                }
+	                
+	                                            
+	                 else {
 	                    throw new IllegalArgumentException("coordonnee invalide");
 	                }
-	            }
+	                       }
 	        } else {
 	            throw new IllegalArgumentException("Case occupeé.");
 	        }
@@ -191,12 +203,11 @@ public class Player extends Pion  {
 	 public boolean validCoordinate(int ligne, int colonne) {
 	        return ligne >= 0 && ligne < 9 && colonne >= 0 && colonne < 9;
 	 }
-	 
+	 public boolean isDiagonal(Coordinate obj) {
+		    int xDiff = Math.abs(this.position.getPositionX() - obj.getPositionX());
+		    int yDiff = Math.abs(this.position.getPositionY() - obj.getPositionY());
+		    return xDiff == 1 && yDiff == 1;
+		}
 	 
 	
 }
-
-
-
-
-   
